@@ -1,0 +1,13 @@
+select q.id_operation,q.id_service ,provider_trans,account,state,substate,time_point,time_process,time_server,
+sum_income/100 as sum_income,
+ot.value 
+from operations.master q left join 
+operation_attributes ot on q.id_operation = ot.id_operation 
+and ot."name" ='transaction-id'
+where id_service in (1471)
+and q.state = 60
+and q.substate = 0
+and q.time_process >='2021-12-01'
+and q.time_process <'2021-12-07'
+and q.time_server >=date'2021-12-01'-interval '7 day'
+and q.time_server < date'2021-12-07'+interval '7 day'
