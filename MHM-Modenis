@@ -1,0 +1,28 @@
+select 
+paymentid,agentpaymentid,p.serviceid,s.servicename ,paydate,statusdate,"Number",paysum,providersum,commissionsum,transactionid
+from reckon.gate_payment p
+join reckon.gate_service s on p.serviceid =s.serviceid  
+where statusdate  between '2022-02-01' and '2022-03-01' and  status=2 and agent<>'3' and duplicate = 1 and  p.osmpproviderid in 
+('18105',
+'18206',
+'17480',
+'17479',
+'17482',
+'17483',
+'17484',
+'17485',
+'17532',
+'17673',
+'17676',
+'17672',
+'17677',
+'17675',
+'17531',
+'18116',
+'18102',
+'18120',
+'18118',
+'18119',
+'18103',
+'18117'
+)
