@@ -1,5 +1,3 @@
-
-
 select [PaymentID],[AgentPaymentID] as 'PortalPaymentID',[AgentTerminalID] as 'TerminalID', PayDate,[StatusDate],[Number],ServiceName,[Terminal Sum] 'Terminal məbləği',
 [Terminal Sum]-QaliqMeblegh as 'HÖP-Ə köçürülən',
 [Terminal Sum]-QaliqMeblegh-coalesce([Üst kommisiya],'0') as 'Müştəriyə köçürülən',QaliqMeblegh,
@@ -32,6 +30,10 @@ then
 	                      then round(Paysum/100,2)
     when p.ServiceID in (1742) --Azerisiq(Q) (2684)
 	                      then round(Paysum/100,2)
+	when p.ServiceID in (1296,1297,1298) --IKZF (2579,2580,2581)
+	                     then round((Paysum*0.15)/100,2)
+	when p.ServiceID in (1299,1300,1301) --BNA(2582,2583,2584)
+	                      then round(Paysum/100,2)
 end as 'Alt Kommisiya',
 case  when p.ServiceID in (1290,1291,1292) ---Ali Tehsil(2573,2574,2575)
     then case  
@@ -49,6 +51,14 @@ case  when p.ServiceID in (1290,1291,1292) ---Ali Tehsil(2573,2574,2575)
 			     end  	
 		  when  p.ServiceID in  (1720,1721,1722,1723,1724,1725) and  cast([PayFields].query('data(fields/field2)') as nvarchar(max)) is not  null 
 		       then cast([PayFields].query('data(fields/field2)') as nvarchar(max))  --round((Paysum)/100,2)
+		 when p.ServiceID in (1730,1731) --DANX(2672,2673)
+		   then case 
+		   when round((Paysum*0.15)/100,2)>15
+		   then 15
+		   when round((Paysum*0.15)/100,2)<0.4
+		   then 0.4
+		   else     round((Paysum*0.15)/100,2)
+		   end 
 			  end as 'Üst kommisiya',	
 			  			   
 PaymentInfo,
@@ -58,3 +68,4 @@ from [dbo].[Payment] p with (nolock)
 join [dbo].[Service] s with (nolock) on p.ServiceID=s.ServiceID where p.ServiceID in (
 1289,1290,1291,1292,1293,1294,1295,1296,1297,1298,1299,1300,1301,1720,1721,1722,1723,1724,1725,1730,1731,1742 )and status=2
 ) t 
+
