@@ -1,0 +1,10 @@
+select sum(providersum) from (
+select paymentid,providerpaymentidstring,
+case when providerpaymentidstring is null 
+then concat(cast(transactionid as varchar),right(concat('0000000000',cast(AgentTerminalID as varchar(10))),10))
+else providerpaymentidstring end as "Tr_id" ,"Number",agentterminalid,providersum,transactionid
+from reckon.gate_payment 
+where statusdate  between '2022-03-01' and '2022-04-01' and status=2 and duplicate = 1 and 
+osmpproviderid in (17798,18087,12405,12405,18088)
+and agent <> '3'
+)t
