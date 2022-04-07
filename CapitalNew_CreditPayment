@@ -1,0 +1,12 @@
+select 
+[AgentPaymentID],s.ServiceName,[PayDate],[StatusDate],[Number],[AgentTerminalID],
+CAST([ExtraParams].query('data(r/kapital_contracrefNo)') as nvarchar(max))kapital_contracrefNo,
+CAST([ExtraParams].query('data(r/kapital_cr_acc)') as nvarchar(max))kapital_cr_acc,
+CAST([ExtraParams].query('data(r/kapital_credittype)') as nvarchar(max))kapital_credittype,
+CAST([ExtraParams].query('data(r/kapital_currentdebt)') as nvarchar(max))kapital_currentdebt,
+CAST([ExtraParams].query('data(r/kapital_maxamountt)') as nvarchar(max))kapital_maxamountt,
+CAST([ExtraParams].query('data(r/kapital_totaldebt)') as nvarchar(max))kapital_totaldebt,
+[PaySum],[ProviderSum],
+CAST(PaymentInfo.query('data(root/OverPaid)') as varchar) OverPaid
+from [dbo].[Payment] p with (nolock) join Service s  with (nolock) on p.ServiceID=s.ServiceID  where p.ServiceID=1737  
+and CAST(PaymentInfo.query('data(root/OverPaid)') as varchar)<>'0'
