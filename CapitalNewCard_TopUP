@@ -1,0 +1,18 @@
+select 
+[AgentPaymentID],s.ServiceName,[PayDate],[StatusDate],[Number],[AgentTerminalID],
+CAST([ExtraParams].query('data(r/kapitalbank_account)') as nvarchar(max))kapitalbank_account,
+--CAST([ExtraParams].query('data(r/kapital_cr_acc)') as nvarchar(max))kapital_cr_acc,
+--CAST([ExtraParams].query('data(r/kapital_credittype)') as nvarchar(max))kapital_credittype,
+--CAST([ExtraParams].query('data(r/kapital_currentdebt)') as nvarchar(max))kapital_currentdebt,
+CAST([ExtraParams].query('data(r/kapital_maxamountt)') as nvarchar(max))kapital_maxamountt,
+--CAST([ExtraParams].query('data(r/kapital_totaldebt)') as nvarchar(max))kapital_totaldebt,
+LEFT(CAST([ExtraParams].query('data(r/trm_prv_id)') as  nvarchar(max)),10)+RIGHT('0000000000'+cast(AgentTerminalID as varchar(10)),10)  trm_prv_id ,
+[PaySum],[ProviderSum],
+--[ExtraParams],
+--PayFields,
+--PaymentInfo,
+CAST(PaymentInfo.query('data(root/OverPaid)') as varchar) OverPaid
+from [dbo].[Payment] p with (nolock) join Service s  with (nolock) on p.ServiceID=s.ServiceID  where p.ServiceID =1701
+--(544,592,964,971,1051,1144,1219,1230,1701,1734,1735,1736,1737)
+and CAST(PaymentInfo.query('data(root/OverPaid)') as varchar) not in ('0.00','0')
+and StatusDate between '2022-04-01' and '2022-04-19'
