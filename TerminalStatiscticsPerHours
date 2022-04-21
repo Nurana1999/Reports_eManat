@@ -1,0 +1,7 @@
+  SELECT LocationName,ts.[PointID],max(CashUnitsCount),cast(cast(hdateFrom as date) as varchar) + ' ' +cast(DATEPART(hour,hDateFrom) as varchar) 'Saat'
+  FROM [Main].[dbo].[TerminalCashSumHistory] ts with (nolock) join point p with (nolock) on ts.PointID=p.PointID
+  join Location l with (nolock) on p.LocationID=l.LocationID
+  where hDateFrom 
+  between '2022-03-21' and '2022-03-24'
+  group by LocationName,ts.[PointID],cast(cast(hdateFrom as date) as varchar) + ' ' +cast(DATEPART(hour,hDateFrom) as varchar)
+ order by [PointID],cast(cast(hdateFrom as date) as varchar) + ' ' +cast(DATEPART(hour,hDateFrom) as varchar)--, CashUnitsCount
