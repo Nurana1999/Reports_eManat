@@ -1,0 +1,20 @@
+ Select a.id_service, a.Name, 
+case when a.totalSUM is null then b.totalSUM when b.totalSUM is null then a.totalSUM else a.totalSUM + b.totalSUM end totalSUM,
+case when a.successCount is null then 0 else a.successCount end successCount, 
+case when b.rejectCount is null then 0 else b.rejectCount end rejectCount
+from
+
+(SELECT s.id_service, s.Name, SUM(p.sum_income/100) as totalSUM, count(id_operation) successCount
+  FROM operations.master p 
+  full join public.Services s  on p.id_service = s.id_service
+  where time_server between '2022-01-25' and '2022-04-25' and p.state = 60 and p.substate = 0 
+  group by s.id_service, s.Name
+  having  SUM(p.sum_income/100)>0 ) a
+  full join 
+(SELECT s.id_service, s.Name, SUM(p.sum_income/100) as totalSUM, count(id_operation) rejectCount
+ FROM operations.master p 
+  full join public.Services s on p.id_service = s.id_service
+  where time_server between '2022-01-25' and '2022-04-25' and p.state != 60
+  group by s.id_service, s.Name
+  having  SUM(p.sum_income/100)>0 ) b
+  on a.id_service = b.id_service
