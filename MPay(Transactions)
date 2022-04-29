@@ -1,0 +1,8 @@
+SELECT date(OM.time_process) as date,l."name" ,s.name as serviceName, count(OM.id_operation) as trnCount
+FROM operations.master OM
+join public.services s on OM.id_service = s.id_service
+join public.provider_services ps on ps.id_service =s.id_service 
+join public.legals l on l.id_legal =ps.id_legal 
+WHERE OM.time_process between '2022-04-01' and '2022-04-29'
+group by 1,2,3
+ORDER BY 1
