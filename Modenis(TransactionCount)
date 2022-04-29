@@ -1,0 +1,6 @@
+Select cast(StatusDate as date),ProviderName,s.ServiceName,
+count(*) 'Say' from [dbo].[Payment] p with (nolock)
+join [dbo].[Service] s with (nolock)  on p.ServiceID=s.ServiceID
+join [dbo].[Provider] pp with (nolock) on s.ProviderID=pp.ProviderID
+where StatusDate between '2022-01-01' and '2022-04-29'
+group by cast(StatusDate as date),ProviderName,s.ServiceName
