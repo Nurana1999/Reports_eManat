@@ -1,0 +1,4 @@
+Select DATEName(MONTH,StatusTime) Ay, PointID,count(*) from [dbo].[Payment]  with (nolock)
+where StatusTime between '2022-01-01' and '2022-05-01'
+group by DATEName(MONTH,StatusTime),PointID
+order by DATEName(MONTH,StatusTime)
