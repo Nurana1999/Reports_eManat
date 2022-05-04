@@ -1,0 +1,5 @@
+select to_char(time_process,'Mon') "Ay" ,id_point,count(*) from operations.master
+where time_process 
+between '2022-04-01' and '2022-05-01'
+group by to_char(time_process,'Mon'),id_point
+order by to_char(time_process,'Mon')
