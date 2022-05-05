@@ -1,0 +1,3 @@
+Select ss.Name ,sg.Name ,ServiceID,s.Name,s.ServiceGroupID,sg.ParentServiceGroupID,sg.Comment  from [dbo].[Service] s with (nolock)
+join [dbo].[ServiceGroup] sg with (nolock) on s.ServiceGroupID=sg.ServiceGroupID  join 
+[dbo].[ServiceGroup] ss with (nolock) on sg.ParentServiceGroupID =ss.ServiceGroupID ;
