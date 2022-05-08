@@ -1,0 +1,28 @@
+Select kg.Kateqoriya 'Categoies',count(PaymentID)'Transaction Count',sum(PayValue)'Transaction Sum' from (
+Select case when a.Kateqoriya is null then a.name
+else a.Kateqoriya end as 'Kateqoriya',
+s.ServiceID,s.Name,s.ServiceGroupID from (
+Select sg.Name 'Kateqoriya',sg1.Name,/*sg.ServiceGroupID,*/sg1.ServiceGroupID from (
+Select * from [dbo].[ServiceGroup] with (nolock) /*where [ParentServiceGroupID] is null*/) sg
+right join 
+(
+Select ServiceGroupID,case when ParentServiceGroupID in (1044,1060,1061,1062,1063,1064,1065)
+then 2   
+when ParentServiceGroupID in (1069,1038,1074,1028,1033,1027,1086,1089,1111,1074,1137,1151,1031)
+then 1007
+when ParentServiceGroupID in (1099,1011,1023,1095)
+then  1016
+when ParentServiceGroupID in (1015,1025)
+then 1006
+when ParentServiceGroupID in (1026)
+then 1019
+when ParentServiceGroupID in (1043)
+then 1005
+else ParentServiceGroupID
+end as 'ParentServiceGroupID',Name,Comment
+from [dbo].[ServiceGroup]  with (nolock) ) sg1  on sg.ServiceGroupID=sg1.ParentServiceGroupID
+/*where sg.Name is not null*/ ) a right join 
+[dbo].[Service] s with (nolock) on a.ServiceGroupID=s.ServiceGroupID ) kg join 
+(select * from Payment  with (nolock)) p on kg.ServiceID=p.ServiceID
+where p.StatusTime between '2022-04-04' and '2022-04-06' and status=2
+group by kg.Kateqoriya
