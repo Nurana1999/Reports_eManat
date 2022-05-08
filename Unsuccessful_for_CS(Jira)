@@ -1,0 +1,47 @@
+select * from (
+select t2.datevalue "Date",ab.stringvalue "Abonentin (adi,soyadi)",concat(p.pkey,'-',j.issuenum) "Maddə",er."Error",hn.textvalue "Hesab No",en.textvalue "Əməliyyat No",tn.textvalue "Terminal No",
+resolutiondate "Date_Resolution",pf."NAME" "Pay from",hn2.textvalue "Hesab No",m.stringvalue "Məbləğ",pr."NAME" "Provider",sy."Systeminfo"  from public.jiraissue j 
+ join (
+select issue,datevalue  from public.customfieldvalue c where c.customfield = 10248) t2
+on j.id =t2.issue 
+join (
+select issue,stringvalue from public.customfieldvalue c where c.customfield = 10476) ab
+on j.id=ab.issue
+join 
+(select issue,textvalue from public.customfieldvalue c where c.customfield = 10626) hn
+on j.id=hn.issue
+join (
+select issue,textvalue from public.customfieldvalue c where c.customfield = 10624) en
+on j.id=en.issue
+join (
+select issue,textvalue from public.customfieldvalue c where c.customfield = 10634) tn
+on j.id=tn.issue
+join (
+select issue,stringvalue from public.customfieldvalue c where c.customfield = 10244) m
+on j.id=m.issue
+join (
+select issue,textvalue from public.customfieldvalue c where c.customfield = 10239) hn2
+on j.id=hn2.issue
+join project p on j.project =p.id 
+join (
+SELECT o."JIRA_ISSUE_ID",o."CUSTOM_FIELD_ID" , ob."ID", "NAME"
+FROM public."AO_8542F1_IFJ_OBJ"  ob join public."AO_8542F1_IFJ_OBJ_JIRAISSUE" o on ob."ID" =o."OBJECT_ID" 
+where o."CUSTOM_FIELD_ID" =10247) pf
+on j.id=pf."JIRA_ISSUE_ID"
+join 
+(select issue,case when cv.customfield= 10242
+then co.customvalue end "Error"
+from public.customfieldvalue cv join public.customfieldoption co on cast(cv.stringvalue as int)=co.id 
+where cv.customfield= 10242
+) er on j.id=er.issue
+join 
+( select issue,case when cv.customfield= 10241
+then co.customvalue end "Systeminfo"
+from public.customfieldvalue cv join public.customfieldoption co on cast(cv.stringvalue as int)=co.id
+where cv.customfield= 10241) sy
+on j.id=sy.issue
+join (SELECT o."JIRA_ISSUE_ID",o."CUSTOM_FIELD_ID" , ob."ID", "NAME"
+FROM public."AO_8542F1_IFJ_OBJ"  ob join public."AO_8542F1_IFJ_OBJ_JIRAISSUE" o on ob."ID" =o."OBJECT_ID" 
+where o."CUSTOM_FIELD_ID" =10231 /*and j.id =77968*/ ) pr
+on j.id =pr."JIRA_ISSUE_ID"
+) t where "Date" between '2022-04-11' and '2022-04-13' order by "Date" 
