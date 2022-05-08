@@ -1,0 +1,36 @@
+with report as 
+(select "Tarix","Modenis Sorgu","MPay sorgu", case when "MPay sorgu"=0 and "Modenis Sorgu"=0 then concat (0,'%')else concat(round(("Modenis Sorgu"*100)/( "MPay sorgu"+"Modenis Sorgu"),1),'%')
+end as "Modenis Nisbet",case when "MPay sorgu"=0 and "Modenis Sorgu"=0 then concat (0,'%')else concat(round(("MPay sorgu"*100)/("MPay sorgu"+"Modenis Sorgu"),1),'%')
+end as "MPay Nisbet","Butun sorgular Cari Ay","Butun sorgular Əvvəlki Ay",
+case when "Butun sorgular Cari Ay"=0 then concat(-100,'%')
+when "Butun sorgular Əvvəlki Ay"=0 then concat(100,'%')
+else concat(round((("Butun sorgular Cari Ay")*100/"Butun sorgular Əvvəlki Ay")-100,1),'%') end as "Ferq" 
+from (
+select concat(extract(day from "Tarix") ,' - ', to_char("Tarix",'Mon')) "Tarix",case when "MPay sorgu" is null then 0 else "MPay sorgu" end as "MPay sorgu",
+case when "Modenis Sorgu" is null then 0 else "Modenis Sorgu" end as "Modenis Sorgu",
+concat(round(("Modenis Sorgu"*100)/( "MPay sorgu"+"Modenis Sorgu"),1),'%') as "Modenis Nisbet",
+concat(round(("MPay sorgu"*100)/("MPay sorgu"+"Modenis Sorgu"),1),'%') as "MPay Nisbet",
+case when "Butun sorgular Cari Ay" is null then 0 else "Butun sorgular Cari Ay" end as "Butun sorgular Cari Ay",
+case when "Butun sorgular Əvvəlki Ay" is null then 0 else "Butun sorgular Əvvəlki Ay" end as "Butun sorgular Əvvəlki Ay",
+concat(round((("Butun sorgular Cari Ay")*100/"Butun sorgular Əvvəlki Ay")-100,1),'%') as "Ferq"
+from 
+(select "Tarix",sum(case when "MPay" is null then 0 else "MPay" end )as "MPay sorgu" ,sum(case when "Modenis" is null then 0 else "Modenis" end) as "Modenis Sorgu" from (
+select distinct date(tarix) as "Tarix",case when system_adi='MPay'then say end as "MPay",case when system_adi='Modenis'then say end as "Modenis"
+from report.jira_sorgu_count where 
+date(tarix) between '2021-12-01' and '2021-12-31' ) t group by "Tarix") t
+ join  (
+select date(tarix) tarix,sum(say) as "Butun sorgular Cari Ay"  from report.jira_sorgu_count 
+where date(tarix)  between '2021-12-01' and '2021-12-31'
+group by date(tarix)) a on t."Tarix"=a.tarix
+ full join 
+(select date(tarix) tarix,sum(say) as  "Butun sorgular Əvvəlki Ay"  from report.jira_sorgu_count 
+where date(tarix)  between '2021-11-01' and '2021-11-30'
+group by date(tarix)) b 
+on extract (day from a.tarix)=extract(day from b.tarix) 
+)t) select * from report 
+union all
+(select 'Toplam',(select sum("MPay sorgu") from report) t,(select sum("Modenis Sorgu") from report)t,
+(select  concat(round(sum("Modenis Sorgu")*100/(sum("Modenis Sorgu")+sum("MPay sorgu")),2),'%') from report) t,
+(select  concat(round(sum("MPay sorgu")*100/(sum("Modenis Sorgu")+sum("MPay sorgu")),2),'%') from report) t,
+(select sum("Butun sorgular Cari Ay") from report)t,(select sum("Butun sorgular Əvvəlki Ay") from report)t,
+(select concat(round((sum("Butun sorgular Cari Ay")*100)/sum("Butun sorgular Əvvəlki Ay"),2)-100,'%') from report) t)
