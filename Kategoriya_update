@@ -1,0 +1,60 @@
+Select 
+kg.Kateqoriya 'Categoies',kg.[Alt kategoriya],kg.ServiceID,ServiceName,count([PaymentID])'Transaction Count',sum([PayValue])'Transaction Sum' from (
+Select case when a.Kateqoriya is null then a.name
+else a.Kateqoriya end as 'Kateqoriya',
+case when s.ServiceID in (1009,1097,1035,1,2,1102,1103,1057,1186,1921,2037,2038,1074,2279,2280,1110,2669)
+then 'Qaz'
+when s.ServiceID in (1303,1304,1081,1082,3,4,1104,1059,1060,1061,1062,1064,1065,1066,1067,1923,1020,1021,1275,1092,1093)
+then 'SU'
+when s.ServiceID in (1026,1994,1995,1996,2012,1025,2277,2278,2285,2286,2708,1922,1109,2684)--(azerisiq_hop,azerisiq,azerenerji(komtec),naxelektrik)
+then 'Elektrik'
+when s.ServiceID in (1116,1118,2600)
+then N'Istilik'
+when s.ServiceID in ('1377','1325','1045','1046','1341','1376','2344','2345','2346','2347','2351','2354','2355','2342','2343',
+'2372','2373','2348','2349','2350','2368','2369','2370','2371','2374','2375','2376','2377','2378','2379','2380','2381','2382','2383','1044','2384',
+'2655','2300','2154'
+)
+then N'ölkəxarici pul kisələrinə vəsait qoyuluşu'
+when s.ServiceID in ('2111','2112','2136','2137','2138','2140','2129','2130','2131','2132','2088','2089','2090','2091','2099',
+'2100','2101','2102','2103','2104','2105','2106','2107','2108','2109','2110','2113','2114','2115','2116','2117','2133','2135',
+'2141','2189','2188','2190','2247','2248','1565','1566','2246','2098','2294','2295','2296','2353','2292','2293','2127','2128','2174',
+'2395','2681','2556','2536','2386','2389','2394','2396','2306','2558','2561')
+then N'ölkədaxili pul kisələrinə vəsait qoyuluşu'
+end as 'Alt kategoriya'
+,s.ServiceID as 'ServiceID',s.Name 'ServiceName',s.ServiceGroupID from (
+Select  sg.Name 'Kateqoriya', sg1.Name,/*sg.ServiceGroupID,*/sg1.ServiceGroupID from (
+Select * from [dbo].[ServiceGroup] with (nolock) /*where [ParentServiceGroupID] is null*/) sg
+right join 
+(
+Select ServiceGroupID,case when ParentServiceGroupID in (1044,1060,1061,1062,1063,1064,1065)
+then 2  
+when ParentServiceGroupID in (1069,1038,1074,1028,1033,1027,1086,1089,1111,1074,1137,1151,1031)
+then 1007
+when ParentServiceGroupID in (1099,1011,1023,1095)
+then  1016
+when ParentServiceGroupID in (1015,1025)
+then 1006
+when ParentServiceGroupID in (1026)
+then 1019
+when ParentServiceGroupID in (1043)
+then 1005
+else ParentServiceGroupID
+end as 'ParentServiceGroupID',
+ Name,Comment
+from [dbo].[ServiceGroup]  with (nolock) ) sg1  on sg.ServiceGroupID=sg1.ParentServiceGroupID
+/*where sg.Name is not null*/ ) a right join 
+[dbo].[Service] s with (nolock) on a.ServiceGroupID=s.ServiceGroupID
+--where s.Name like '%topaz%'
+--where a.Kateqoriya like '%e-pulqab%'
+) kg join 
+(select pp.PaymentID,pp.ServiceID,pp.StatusTime,PayValue from Payment pp with (nolock) join [Main].[dbo].[Payment_Dealer] d with (nolock) on pp.PaymentID=d.PaymentID 
+where d.DealerID in (5,12,13,16,17,18)
+  and pp.Status=2 
+  and d.level=0
+--and CAST(pp.StatusTime as date) =  dateadd(DD,-1,(CAST(getdate() as date)))  
+ ) p
+on kg.ServiceID=p.ServiceID
+--join
+--(select [AgentPaymentID],[PaySum] from  [gate].[dbo].[Payment]  with (nolock)) gp on p.PaymentID=gp.AgentPaymentID
+where p.StatusTime between '2022-04-01' and '2022-05-01' --and ServiceName in ('E-Topaz Yeni (NetBet MMC)','E-Topaz Yeni (NetBet MMC)')
+group by kg.Kateqoriya,kg.[Alt kategoriya],kg.ServiceID,ServiceName
