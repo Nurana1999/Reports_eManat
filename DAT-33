@@ -1,0 +1,5 @@
+Select [AgentTerminalID],cast(StatusDate as date),p.ServiceID,s.ServiceName,sum(paysum),count(*)
+from [dbo].[Payment] p with (nolock) join Service s with (nolock) on p.ServiceID=s.ServiceID
+where statusdate >='2022-05-01' and OsmpProviderID in 
+(17764, 18049, 15843, 17744, 17798, 14815,14816,14818,14819,14822,14823, 14821, 14817, 14824)
+group by [AgentTerminalID],cast(StatusDate as date),p.ServiceID,s.ServiceName
