@@ -1,0 +1,4 @@
+select id_point,cast(time_server as date),m.id_service ,s."name" ,sum(sum_income/100),count(*)
+FROM operations.master m join public.services s on m.id_service =s.id_service 
+where time_server >='2022-05-01' and m.id_service in (1460,1461,1462, 1463,800,802,899,1617,1618)
+group by  id_point,cast(time_server as date),m.id_service,s."name" 
