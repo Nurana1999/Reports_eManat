@@ -1,0 +1,13 @@
+select p.[PaymentID],[PointID],[TransactionID],[PayTime],[StatusTime],p.[ServiceID] ,
+[Number],abbrrn.ExtraValue abbrrn,abb_accountnumber.ExtraValue abb_accountnumber,abb_cardNo.ExtraValue abb_cardNo,
+abb_cardHolderName.ExtraValue abb_cardHolderName
+from [dbo].[Payment] p with (nolock) join 
+(Select * from [dbo].[Payment_Extra] where ExtraID=586) abbrrn on p.PaymentID=abbrrn.PaymentID
+join 
+(Select * from [dbo].[Payment_Extra] where ExtraID=593) abb_accountnumber on p.PaymentID=abb_accountnumber.PaymentID
+join 
+(Select * from [dbo].[Payment_Extra]where ExtraID=1684) abb_cardNo on p.PaymentID=abb_cardNo.PaymentID
+join 
+(Select * from [dbo].[Payment_Extra] where ExtraID=1688) abb_cardHolderName on p.PaymentID=abb_cardHolderName.PaymentID
+join Service s on p.ServiceID=s.ServiceID
+where p.[PaymentID]='602086110'
