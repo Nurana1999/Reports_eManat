@@ -1,0 +1,11 @@
+select a."TerminalID",gp.osmpproviderid,a."Name",a."Month",sum(payvalue),count(a.paymentid) from 
+(
+select p.paymentid,p.pointid "TerminalID",s."Name" ,to_char(statustime,'month') as "Month",pd.dealerid ,
+payvalue,statustime
+from main.payment p  
+join main.service s 
+on p.ServiceID=s.ServiceID join main.payment_dealer pd on p.paymentid=pd.paymentid
+) a 
+join (select * from gate.payment ) gp on a.paymentid=gp.agentpaymentid
+where a.statustime  between '2022-05-01' and '2022-05-17' and a.dealerid in (5,12,13,16)
+group by a."TerminalID",gp.osmpproviderid,a."Name",a."Month"
