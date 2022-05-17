@@ -1,0 +1,4 @@
+select id_point,s.id_service ,s."name" , to_char(time_process,'month') as "Month",sum(sum_income/100),count(*) 
+from operations.master m  join public.services s on m.id_service =s.id_service 
+where m.time_process between '2022-05-01' and '2022-05-17' and m.id_point !=8
+group by id_point,s.id_service ,s."name" , to_char(time_process,'month') 
