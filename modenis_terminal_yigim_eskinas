@@ -1,0 +1,4 @@
+SELECT  datename(month,CashOutDate),sum(CashOutUnitsCount),sum([CashOutUnitsSum])
+  FROM [Main].[dbo].[TerminalCashOut] with (nolock)
+  where CashOutDate between '2022-01-01' and '2022-05-19' and pointid not in (4244,4245,4702)
+  group by datename(month,CashOutDate)
