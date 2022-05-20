@@ -1,0 +1,4 @@
+EXECUTE  [dbo].[GetNewPayment] 
+ @Login = N'nurana.rzayeva'
+,@PasswordMD5 = N'B5C2B5E25A6ECE84EDBA85BFBF3D9CB4'
+,@DealerID=5
