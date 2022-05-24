@@ -1,0 +1,11 @@
+select cast(time_process as date),count(distinct id_point),count(distinct id_service),
+sum(q.sum_income/100) as sum_in
+from  operations.master q
+where    
+        time_process >= '2022-05-01' 
+       and time_process < '2022-05-24' 
+       and time_server >= date '2022-05-01' - interval '7day'
+       and time_server < date '2022-05-24' + interval '7day' 
+       and id_point <>8
+group by  cast(time_process as date)
+order by cast(time_process as date) 
