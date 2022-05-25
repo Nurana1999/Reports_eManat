@@ -1,0 +1,11 @@
+select id_operation,id_point,account,time_process,time_server,cast(sum_income as numeric)/100 as sum_income ,
+cast(sum_outcome as numeric)/100 sum_outcome,
+provider_trans,s."name" 
+FROM operations.master q join public.services s on q.id_service =s.id_service 
+where q.id_service in (906,913,914,915,916)
+and q.state = 60      
+       and q.substate = 0
+       and q.time_process >= '2022-04-01' 
+       and q.time_process < '2022-05-01' 
+       and q.time_server >= date '2022-04-01' - interval '7day'
+       and q.time_server < date '2022-05-01' + interval '7day'
