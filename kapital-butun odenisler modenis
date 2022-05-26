@@ -1,0 +1,12 @@
+Select s.ServiceID,
+s.ServiceName,p.OsmpProviderID,
+[AgentPaymentID],
+[AgentID],[PayDate],[StatusDate],[Number],[AgentTerminalID],status,[PaySum],[ProviderSum],
+[CommissionSum],
+CAST([ExtraParams].query('data(r/kapitalbank_account)') as  nvarchar(max)) kapitalbank_account,
+CAST([ExtraParams].query('data(r/kapitalbank_uid)') as  nvarchar(max)) kapitalbank_uid,
+CAST([ExtraParams].query('data(r/kapital_maxamountt)') as nvarchar(max))kapital_maxamountt,
+LEFT(CAST([ExtraParams].query('data(r/trm_prv_id)') as  nvarchar(max)),10)+RIGHT('0000000000'+cast(AgentTerminalID as varchar(10)),10)  trm_prv_id
+from payment p with (nolock) join service s with (nolock) on p.ServiceID=s.ServiceID
+where PayDate between '2022-05-25 15:30' and  getdate() and p.ServiceID in (971,
+964,544,1144,1230,1701,1734,1735,1736,1737)
