@@ -1,0 +1,5 @@
+select id_operation,m.id_service,s."name" ,id_point,account, account2,state,substate,time_point  ,time_server ,time_process,
+cast(sum_income as numeric)/100 sum_income ,cast(sum_outcome as numeric)/100 sum_outcome ,cast(sum_comm as numeric)/100 sum_comm,provider_trans
+from operations.master m join public.services s on m.id_service =s.id_service 
+where m.id_service in (1584,1583,1581,1580,1579,1471,1013,912,629,628) and time_server 
+between '2022-05-25 15:30' and now()
