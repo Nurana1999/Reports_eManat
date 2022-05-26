@@ -1,0 +1,5 @@
+Select [PaymentID],[PointID],[TransactionID],[PayTime],[StatusTime],[Number],
+[Status],[PayValue],[ServiceValue],p.ServiceID,s.Name
+from [dbo].[Payment] p  with (nolock)  join [dbo].[Service] s with (nolock)
+on p.ServiceID=s.ServiceID where [PayTime] between '2022-05-19' and '2022-05-26'
+and p.ServiceID in (1426,1911,1226,1056,1551,1909,1910) and status=2
