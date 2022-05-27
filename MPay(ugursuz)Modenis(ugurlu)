@@ -1,0 +1,20 @@
+select paymentid,transactionid,pointid,paytime,statustime,serviceid ,"Number" , payvalue,status,m.*  from  main.payment p join 
+(select id_operation ,id_point ,account,time_server,provider_trans,state, sum_income,value from (
+select  m.id_operation, id_point,account,time_server,provider_trans,state,sum_income/100 sum_income, a.value
+from "work".master m left join
+(select id_operation,value from "work".operation_attributes where name='proc') a on m.id_operation =a.id_operation )t) m
+on cast(p.transactionid as varchar) =m.value and p.payvalue =m.sum_income  and p."Number" = m.account  where 
+m.id_operation in (1104400072,
+1104402605,
+1104407528,
+1104410315,
+1104419688,
+1104423875,
+1104434982,
+1104468914,
+1104470791,
+1000850748,
+1000851015,
+1000851390
+)
+ and p.pointid=4702
