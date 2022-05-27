@@ -1,0 +1,45 @@
+
+Select p.[PaymentID],[PointID],[PayTime],[StatusTime],[Number],s.Name,[PayValue],
+[PayValue]-substring(q.ExtraValue,15,len(q.ExtraValue))
+ 'Hop-e kocurulen',substring(q.ExtraValue,15,len(q.ExtraValue)) as qaliq,
+substring(k.extravalue,19,len(k.extravalue)) as ust,
+case when p.ServiceID in (2572) ---Belediyye(2572) 
+then 
+     case when  p.ServiceID in (2572) and  [PayValue]/100>15
+						then 15
+					    else [PayValue]/100
+				end  
+    when p.ServiceID in (2576,2577,2578)  --İSB(2576,2577,2578)  
+	   then case 
+	         when p.ServiceID in (2576,2577,2578)  and ([PayValue]*0.5)/100<0.2
+	                     then 0.2
+			when p.ServiceID in (2576,2577,2578)  and ([PayValue]*0.5)/100>15
+			             then 15
+						 else ([PayValue]*0.5)/100
+						 end 
+    when p.ServiceID in (2663,2664,2665,2666,2667,2668) and substring(k.extravalue,19,len(k.extravalue))='0'
+	--DYP(2663,2664,2665,2666,2667,2668)
+	                      then [PayValue]/100
+    when p.ServiceID in (2684) --Azerisiq(Q) (2684)
+	                      then [PayValue]/100
+	when p.ServiceID in (2579,2580,2581)--IKZF (2579,2580,2581)
+	     then  case when sk.ExtraValue in (81600500,81600600,81600700,81600800,81600900)
+	                      then ([PayValue]*0.5)/100
+				when sk.ExtraValue in (81600100,81600200,81600300,81600400,81601000,81601200,81601300,81601100,81601400)
+				          then ([PayValue]*0.15)/100
+						  end 
+	when p.ServiceID in (2582,2583,2584) --BNA(2582,2583,2584)
+	                      then [PayValue]/100
+	when p.ServiceID in (2686,2687) --DIM
+	                      then [PayValue]/100
+end as 'Alt Kommisiya'	
+from [dbo].[Payment] p with (nolock) join [dbo].[Service] s with (nolock) on p.ServiceID=s.ServiceID
+  join (Select PaymentID,extravalue from [dbo].[Payment_Extra] pe with (nolock) where extraid=1938) k  on p.PaymentID=k.PaymentID
+ join (Select PaymentID,extravalue from [dbo].[Payment_Extra] pe with (nolock) where extraid=1939) q on p.PaymentID=q.PaymentID
+  join (Select PaymentID,extravalue from [dbo].[Payment_Extra] pe with (nolock) where extraid=1922) sk on p.PaymentID=sk.PaymentID
+where PayTime between '2022-04-01' and '2022-05-01'  and status=2 and 
+p.ServiceID in (2572,2573,2574,2575,2576,2577,2578,2579,2580,2581,2582,2583,2584,2663,2664,2665,2666,2667,2668,2672,2673,2684,2686,2687,2715,2716)
+
+--Select * from [dbo].[Payment] p with (nolock) join [dbo].[Payment_Extra] pe with (nolock) on p.PaymentID=pe.PaymentID
+--where p.ServiceID in (2573,2574,2575)
+--Select  * from service where name like '%hop%'
