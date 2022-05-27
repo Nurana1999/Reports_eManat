@@ -1,5 +1,7 @@
- select  concat(cast(id_service as varchar),cast("ID" as varchar)) as id_service,case when "service" is null
-then name else "service" end as "servicename" , sum_in,sum_out,sum_com,"Count",legal,provider from 
+  select  concat(cast(id_service as varchar),cast("ID" as varchar)) as id_service,case when "service" is null
+then name else "service" end as "servicename" , sum_in,sum_out,sum_com,"Count",legal,
+case when concat(cast(id_service as varchar),cast("ID" as varchar)) in ('80306','146106','146206','146306') 
+then 'Birləşmiş sukanal MMC (Azərsu)' else provider end as provider from 
   (select   q.id_service,   
 case when q.id_service  in (797,798,1460,803,1461,1462,1463)
 then case 
@@ -40,4 +42,5 @@ where q.state = 60
        and q.time_process < '2022-05-01' 
        and q.time_server >= date '2022-04-01' - interval '7day'
        and q.time_server < date '2022-05-01' + interval '7day'
-     group by q.id_service,"service",l.id_legal ,p.name , s."name" ,"ID") t 
+     group by q.id_service,"service",l.id_legal ,p.name , s."name" ,"ID") t    
+       
