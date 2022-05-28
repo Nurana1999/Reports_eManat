@@ -1,0 +1,24 @@
+
+with mp as (
+select paymentid,transactionid,row_number() over (partition by transactionid order by paytime desc) rn,pointid,paytime,statustime,serviceid ,"Number" ,
+payvalue,status,m.id_operation,m.account,m.time_server,m.state,m.sum_income  from  main.payment p join 
+(select id_operation ,id_point ,account,time_server,state, sum_income,value from (
+select  m.id_operation, id_point,account,time_server,provider_trans,state,sum_income/100 sum_income, a.value 
+from "work".master m left join
+(select id_operation,value from "work".operation_attributes where name='proc') a on m.id_operation =a.id_operation )t) m
+on cast(p.transactionid as varchar) = m.value and p.payvalue =m.sum_income  and p."Number" = m.account  where 
+m.id_operation in (
+1018457413,
+1018458341,
+1018462576,
+1018470973,
+1018481779,
+1018510388,
+1018510889,
+1018514148,
+1018520186,
+1018522149
+)
+and p.pointid=4702 
+order by statustime desc
+) select * from mp  where rn=1
