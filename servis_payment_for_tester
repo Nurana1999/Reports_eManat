@@ -1,0 +1,10 @@
+SELECT  p.OsmpProviderID,pr.ProviderID,pr.ProviderName,s.ServiceID,
+s.ServiceName,sum(summa)as summa,sum(say) as say,max(PayDate) as 'last paydate' 
+FROM [gate211].[dbo].[Service] s left join
+(Select OsmpProviderID,ServiceID,sum(paysum) summa,PayDate,
+count([AgentPaymentID]) say from [dbo].[Payment]
+where PayDate between '2022-03-01' and '2022-04-01'
+group by ServiceID,PayDate,OsmpProviderID) p 
+on s.ServiceID=p.ServiceID left join Provider pr on s.ProviderID=pr.ProviderID
+group by p.OsmpProviderID,pr.ProviderID,pr.ProviderName,s.ServiceID,
+s.ServiceName
