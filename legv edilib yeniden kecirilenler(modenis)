@@ -1,0 +1,11 @@
+Select * from 
+(SELECT [AgentPaymentID],[AgentID],[PayDate],[StatusDate],[Number],[AgentReceipteNumber],
+[AgentTerminalID],[PaySum],[Status],
+CAST([ExtraParams].query('data(r/trm_prv_id)') as nvarchar(max)) as tr
+  FROM [Payment] where paydate between '2022-02-01' and '2022-03-01' and status=3) p1 join 
+  (SELECT [AgentPaymentID],[AgentID],[PayDate],[StatusDate],[Number],[AgentReceipteNumber],
+[AgentTerminalID],[PaySum],[Status],
+CAST([ExtraParams].query('data(r/trm_prv_id)') as nvarchar(max)) as tr
+  FROM [Payment] where paydate between '2022-02-01' and '2022-04-01' and status=2) p2
+  on p1.tr=p2.tr and p1.PaySum=p2.PaySum and p1.Number=p2.Number  
+  and p1.AgentReceipteNumber=p2.AgentReceipteNumber and p1.StatusDate<p2.StatusDate
