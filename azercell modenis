@@ -1,0 +1,5 @@
+select sum(paysum) from (
+select paymentid,agentpaymentid,serviceid,"Number",agentterminalid,
+status,osmpproviderid,paysum,providersum,paydate,statusdate from gate.payment 
+where 
+paydate between '2022-05-01' and '2022-06-01'and serviceid =543 and status=2 )t
