@@ -1,0 +1,15 @@
+select q.id_operation,q.id_service,s."name" ,account ,state,substate,time_point,time_process,time_server,cast(sum_income as numeric)/100 as sum_income,
+cast(sum_outcome as numeric)/100 as sum_outcome,cast(sum_comm as numeric)/100 as sum_comm,
+id_point 
+from operations.master q --left join 
+--"work".operation_attributes_customer ot on q.id_operation =ot.id_operation 
+--and ot."name" ='transaction-id'
+left join 
+ public.services s on q.id_service =s.id_service 
+where q.id_service=1036
+and q.state =60
+and q.substate =0
+and q.time_process >='2022-05-01'
+and q.time_process <'2022-06-01'
+and q.time_server >=date'2022-05-01'-interval '7 day'
+and q.time_server <date'2022-06-01'+interval '7 day'
