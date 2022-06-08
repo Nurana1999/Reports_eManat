@@ -1,0 +1,19 @@
+--Select * from service where servicename like '%Bankof%'
+
+Select [AgentPaymentID],[AgentID],[PayDate],[StatusDate],[Number],[AgentTerminalID],
+case when p.serviceid=1123 then 
+CAST(ExtraParams.query('data(r/bob_debet_contractname)') as nvarchar) 
+when p.serviceid=324 then 
+CAST(ExtraParams.query('data(r/base_acc)') as nvarchar)
+else null
+end as 'Bob_Account',
+case 
+when p.serviceid=323 then 
+CAST(ExtraParams.query('data(r/transaction)') as nvarchar)
+when p.serviceid=325 then 
+CAST(ExtraParams.query('data(r/transaction)') as nvarchar)
+else null 
+end as 'Bob _transaction',
+[PaySum],[ProviderSum]
+from payment p with (nolock) join service s with (nolock) on p.ServiceID=s.ServiceID where 
+p.serviceid in (323,324,325,326,556,1123,1714) and paydate between '2022-05-01' and '2022-06-01' and status=2 
