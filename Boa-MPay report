@@ -1,0 +1,20 @@
+select m.id_operation,id_point,account,time_server,time_point,cast(sum_income as numeric)/100 as sum_income,
+cast(sum_outcome as numeric)/100 sum_outcome,cast(sum_comm as numeric)/100 sum_comm,
+fln.value as fullname,fin.value as Fin,cno.value as ContractNo,mno.value,uid.value,s."name" 
+from operations.master m join public.services s on m.id_service = s.id_service 
+left join  
+(select id_operation,value from public.operation_attributes where "name" = 'fullName') fln on m.id_operation =fln.id_operation 
+left join 
+(select id_operation,value from public.operation_attributes where "name" = 'fin') fin on m.id_operation =fin.id_operation 
+left join 
+(select id_operation,value from public.operation_attributes where "name" = 'contactNo') cno on m.id_operation =cno.id_operation
+left join 
+(select id_operation,value from public.operation_attributes where "name" = 'Müqavilə nömrəsi') mno on m.id_operation =mno.id_operation
+left join 
+(select id_operation,value from public.operation_attributes where "name" = 'uid') uid on m.id_operation =uid.id_operation
+where m.id_service = 997  
+ and m.state=60 and m.substate =0 and 
+ m.time_process >= '2022-05-01' 
+      and m.time_process < '2022-06-01' 
+      and m.time_server >= date '2022-05-01' - interval '7day'
+      and m.time_server < date '2022-06-01' + interval '7day'
