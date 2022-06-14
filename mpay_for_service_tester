@@ -1,10 +1,11 @@
-select l."name" ,a.name ,a.sum_income ,a.say,a.lastdate,st.name from 
+select st.name categories,a.id_service,l."name" as providername ,a.name servicename,a.sum_income ,a.say Count,a.lastdate lastpaydate from 
 (select s.name,m.id_provider,s.id_service,s.id_service_type,sum(sumincome) sum_income,count(id_operation) say,max(time_server) lastdate from(
 (select * from public.services where id_service in (1545,1547,1546,1534,1536,1537,1538,1542,1548,1550,1440,
-1444,1441,1439,334,365,366,388,1472,1468,391,803,61,1601,1480,49,1474,48,429,432,433,1478,1475,441,1554,454,505,543,545,556,1485,559,565,568,1620,577,1603,1596,1598,607,1621,616,620,1581,1579,1580,1584,1583,1041,1040,645,959,682,707,
+1444,1441,1439,334,365,366,388,1472,1468,391,803,61,1601,1480,49,1474,48,429,432,433,1478,1475,441,1554,454,505,543,545,556,1485,559,565,568,1620,577,1603,1596,
+1598,607,1621,616,620,1581,1579,1580,1584,1583,1041,1040,645,959,682,707,
 720,752,1588,778,971,972,973,1036,464,1466,1014,1016,200,1032,1033,1034,40,640,1477,119,504,50,837,85,1544,1017,594,1551,1549,1002,199,451,1476,471,453,
-435,215,1465,431,1015,373,98,997,1470,273,385,1025,1443,320,124,274,1533,230,1502,492,151
-) ) s left join 
+435,215,1465,431,1015,373,98,997,1470,273,385,1025,1443,320,124,274,1533,230,1502,492,151,1464
+)) s left join 
 (select id_operation,id_legal,id_provider , id_service,cast(sum_income as numeric)/100 as sumincome,time_server from operations.master
 where time_server between '2022-06-05 11:00' and '2022-06-06 12:00' and id_point<>8) m 
 on s.id_service =m.id_service 
