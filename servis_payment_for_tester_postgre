@@ -1,5 +1,5 @@
 
-select a.*,b.Categories from  (
+select b.Categories,a.OsmpProviderID,a.ProviderName,a.ServiceName,a."Sum",a."Count",a."LastPaydate" from  (
 Select OsmpProviderID,pr.ProviderName,p.serviceid ,s.ServiceName,case when sum(PaySum) is null then 0 else sum(PaySum)
 end as "Sum" ,
 case when count(AgentPaymentID) is null then 0 else count(AgentPaymentID)
@@ -68,3 +68,5 @@ end as "ParentServiceGroupID",
 from ServiceGroup ) sg1  on sg.ServiceGroupID=sg1."ParentServiceGroupID"
 /*where sg.Name is not null*/ ) a right join Service s on a.ServiceGroupID=s.ServiceGroupID) y) b
 on a.osmpproviderid =b.osmpproviderid  
+
+
