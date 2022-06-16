@@ -1,0 +1,21 @@
+select q.id_operation,q.id_service,id_point,account,time_point,time_server,time_process, cast(sum_income as numeric)/100 sum_income,
+cast(sum_outcome as numeric)/100 sum_outcome,tran.value as trans,cr_acc.value as cr_acc ,cast(contractNo.value as text) as accno,maxamount.value as maxamount ,cif.value as cif
+from reckon.work_master q
+join reckon.work_services s on q.id_service =s.id_service 
+left join
+(select id_operation,value from reckon.work_operation_attributes where name ='trans' )  tran on q.id_operation =tran.id_operation 
+left join
+(select id_operation,value from reckon.work_operation_attributes where name ='cr_acc' )  cr_acc on q.id_operation =cr_acc.id_operation 
+left join
+(select id_operation,value from reckon.work_operation_attributes where name ='contractNo' )  contractNo  on q.id_operation =contractNo.id_operation 
+left join
+(select id_operation,value from reckon.work_operation_attributes where name ='maxAmount' ) maxamount on q.id_operation =maxamount.id_operation 
+left join
+(select id_operation,value from reckon.work_operation_attributes where name ='cif' ) cif on q.id_operation =cif.id_operation 
+where q.id_service in (1583)
+and  q.state = 60    
+       and q.substate = 0
+        and q.time_process >= '2022-05-15' 
+       and q.time_process < '2022-06-01' 
+       and q.time_server >= date '2022-05-15' - interval '7day'
+       and q.time_server < date '2022-06-01' + interval '7day'
