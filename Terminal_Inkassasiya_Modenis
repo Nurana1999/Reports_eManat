@@ -1,0 +1,30 @@
+USE [Main]
+Select * from (
+SELECT  t.[PointID]
+ ,p.PointName
+	  ,[LastPayDateTime]  as 'Son ödəniş Tarixi',
+	  CASE WHEN CAST( DATEDIFF(DAY,    [LastPayDateTime], GETDATE())    AS nvarchar(100))='0' THEN '' ELSE CAST( DATEDIFF(DAY,    [LastPayDateTime], GETDATE())    AS nvarchar(100)) + N' Gün ' END
+       + CASE WHEN CAST( DATEPART(HOUR,   GETDATE() - [LastPayDateTime]) AS nvarchar(100))='0' THEN '' ELSE CAST( DATEPART(HOUR,   GETDATE() - [LastPayDateTime]) AS nvarchar(100))+ ' Saat ' END
+       + CAST( DATEPART(MINUTE, GETDATE() - [LastPayDateTime]) AS nvarchar(100)) + N' Dəq '  as  N'Son ödənişdən keçən vaxt',
+	  lco.LastCashOutDateTime  as 'Son inkassasiya Tarixi'
+	  ,CASE WHEN CAST( DATEDIFF(DAY,    lco.LastCashOutDateTime, GETDATE())    AS nvarchar(100))='0' THEN '' ELSE CAST( DATEDIFF(DAY,    lco.LastCashOutDateTime, GETDATE())    AS nvarchar(100)) + N' Gün ' END
+       + CASE WHEN CAST( DATEPART(HOUR,   GETDATE() - lco.LastCashOutDateTime) AS nvarchar(100))='0' THEN '' ELSE CAST( DATEPART(HOUR,   GETDATE() - lco.LastCashOutDateTime) AS nvarchar(100))+ ' Saat ' END
+       + CAST( DATEPART(MINUTE, GETDATE() - lco.LastCashOutDateTime) AS nvarchar(100)) + N' Dəq '  as  N'Son inkassasiyadan keçən vaxt'
+  ,[CashUnitsCount] as [Əskinaz sayı]
+      ,[CashUnitsSum] as N'Terminal qalığı',
+	  CASE 
+	  WHEN [NoteErrorID]=1 THEN N'Pulqabi Dolub'  
+	  WHEN  [NoteErrorID]=2 THEN N'Kasset çıxarılıb'
+	  ELSE '' END as 'Status'
+  FROM [Main].[dbo].[Terminal] t with(nolock)
+  Join [Main].[dbo].[Point] p ON p.PointID=t.PointID
+  JOIN [Main].[dbo].[TerminalCashSum] tcs ON tcs.PointID=t.PointID and MoneyType=1
+  JOIN (SELECT [PointID],MAX([CashOutDate]) 'LastCashOutDateTime'
+  FROM [Main].[dbo].[TerminalCashOut]   GROUP BY PointID) lco ON t.PointID=lco.PointID
+  where 
+  ([NoteErrorID]=1 
+  --OR [CashUnitsSum] > 3000 
+  OR [CashUnitsCount]>500)
+  and p.DealerID=5 
+  and t.PointType=1
+  /*order by 7 desc*/) t where status = N'Pulqabi Dolub' and [Əskinaz sayı]>500  order by  7 desc
