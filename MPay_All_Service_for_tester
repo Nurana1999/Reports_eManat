@@ -1,0 +1,16 @@
+select st.name categories,a.id_service, case when l."name" is null then '' else l."name"  end as "providername" ,a.name servicename,
+case when a.sum_income is null 
+then 0 else a.sum_income 
+end as "sum_income" ,
+a.say Count, case when  cast(a.lastdate as varchar) is null 
+then '-' else cast(a.lastdate as varchar)
+end as   "lastpaydate" from 
+(select s.name,m.id_provider,s.id_service,s.id_service_type,sum(sumincome) sum_income,count(id_operation) say,max(time_server) lastdate from(
+(select * from public.services ) s left join 
+(select id_operation,id_legal,id_provider , id_service,cast(sum_income as numeric)/100 as sumincome,time_server from operations.master
+where time_server between '2022-06-17' and '2022-06-24' and id_point<>8) m 
+on s.id_service =m.id_service 
+) group by s.name,s.id_service,m.id_provider,s.id_service_type) a left join
+(select * from public.legals) l on a.id_provider =l.id_legal
+join 
+(select * from public.service_types) st on a.id_service_type=st.id_service_type
