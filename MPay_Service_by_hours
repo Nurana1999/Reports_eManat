@@ -1,0 +1,9 @@
+select s.id_service ,s."name" ,to_char(time_server,'dd-mm-yyyy') as tarix,extract (hour from time_server) as saat,count(*) transactioncount,sum(cast(sum_income as numeric))/100 as summa,
+count(distinct id_point) as terminalcount,
+case when state=60 then 'ugurlu'
+when state=80 then 'ugursuz'
+when state=40 then 'novbede'
+end as "status"
+from operations.master m join public.services s on m.id_service =s.id_service 
+where time_server between '2022-06-23' and '2022-06-24'
+group by s.id_service ,s."name",tarix,saat,"status" order by saat
