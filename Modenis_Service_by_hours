@@ -1,0 +1,9 @@
+select s.serviceid ,s."Name" ,to_char(paytime,'dd-mm-yyyy') as tarix,
+extract (hour from paytime) as saat,count(*) as transactioncount,sum(payvalue) as summa,count( distinct pointid) as terminalcount,
+case when status=2 then 'ugurlu' 
+when status=3 then 'ugursuz'
+else 'novbede'
+end as "status"
+from main.payment p join service s on p.serviceid =s.serviceid 
+where paytime  between '2022-06-23' and '2022-06-24'
+group by s.serviceid ,s."Name",tarix,saat,"status" order by saat
