@@ -1,0 +1,3 @@
+SELECT pr.providerid,os.osmpproviderid ,providername,s.serviceid ,s.servicename 
+FROM gate.provider pr join gate.service s on pr.providerid =s.providerid join gate.osmp_service os on s.serviceid =os.serviceid 
+where pr.providerid =244
