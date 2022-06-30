@@ -1,0 +1,4 @@
+Select [PaymentID],[PointID],[TransactionID],[CreateTime],[StatusTime],p.[ServiceID],[Number],
+[Status],[PayValue],[ServiceValue],[PortalComment],p.[Comment],s.name
+from payment p with (nolock) join service s on p.serviceid=s.serviceid  where  status<>2 and  p.ServiceID in (2704,2705,2706) and CreateTime between '2022-06-28' and getdate()
+and TransactionID in
