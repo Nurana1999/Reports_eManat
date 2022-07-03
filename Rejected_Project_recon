@@ -1,0 +1,13 @@
+with cte as (
+select  m.id_operation,m.id_service,m.account,m.time_server,m.sum_income /100 as sumincome,m.provider_trans ,
+opt.value as op_at_comment,oc."comment" as op_comment,s.service_name  from reckon.work_master m join reckon.work_services s on m.id_service=s.id_service
+left join 
+(select id_operation,op.value from reckon.work_operation_attributes op
+where op."name"='comment') opt   on m.id_operation =opt.id_operation  
+left join 
+(select id_operation,"comment" from reckon.work_operation_comments) oc on m.id_operation =oc.id_operation 
+where  time_server  between '2022-05-01' and '2022-05-05' and state=80 and substate <>6 and sum_income>0)
+select * from cte w left join 
+(select paymentid,pointid,transactionid,createtime,serviceid,"Number",payvalue,status from main.payment where pointid='4702'
+createtime > '2022-05-01') mp on w.provider_trans = mp.transactionid
+where op_at_comment is null and op_comment is null 
