@@ -1,0 +1,17 @@
+select 
+id_operation,id_point,account,state,substate,time_server,time_process, cast(sum_income as numeric)/100 sum_income,
+cast(sum_outcome as numeric)/100 sum_outcome,cast(sum_comm as numeric)/100 sum_comm,s."name" servicename,
+p."name" providername
+from operations.master q
+left join public.services s on (q.id_service=s.id_service)
+left join public.legals l on (q.id_legal=l.id_legal)
+left join public.legals p on (q.id_provider=p.id_legal)
+where q.state = 60    
+      and p.id_legal not in (16,17,20)   
+       and q.substate = 0
+       and q.time_process >= '2022-01-01' 
+       and q.time_process < '2022-02-01' 
+       and q.time_server >= date '2022-01-01'  - interval '7day'
+       and q.time_server < date '2022-02-01'  + interval '7day'
+       and p."name" like 'Pas%'
+       order by q.time_server
