@@ -1,3 +1,4 @@
+---Modenis
 
 select t.servicename, to_char(tarix,'Mon') as ay,sum("3-uzeri") as "3-uzeri",count("3-uzeri") "3-uzeri tr say",
 sum("5-uzeri") as "5-uzeri",count("5-uzeri") "5-uzeri tr say" from (
@@ -7,3 +8,16 @@ case when paysum>5 then paysum end as "5-uzeri" from gate.payment p
 join service s on p.serviceid =s.serviceid and 
 paydate between '2022-04-01' and '2022-07-01' and status=2 and p.serviceid in (543,163,694,695)) as t 
 group by t.servicename,to_char(tarix,'Mon') order by to_char(tarix,'Mon')
+
+
+--MPay
+
+
+select t."name",to_char(tarix,'Mon') as ay, sum("3-uzeri") as "3-uzeri yigim",count("3-uzeri") as "3-uzeri tr say",sum("5-uzeri") as "5-uzeri yigim",count("5-uzeri") as "5-uzeri tr say" from (
+select s."name",time_server as tarix,id_operation, 
+case when cast(sum_income as numeric) /100 > 3 then cast(sum_income as numeric) /100 end as "3-uzeri",
+case when cast(sum_income as numeric) /100 > 5 then cast(sum_income as numeric) /100 end as "5-uzeri"
+from operations.master m join public.services s on m.id_service =s.id_service where m.id_service in (388,1474,1472,1473)
+and time_server between '2022-04-01' and '2022-07-01' and state=60 and substate = 0
+) as t 
+group by t."name",to_char(tarix,'Mon') order by to_char(tarix,'Mon')
