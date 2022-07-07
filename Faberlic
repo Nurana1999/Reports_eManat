@@ -1,0 +1,9 @@
+select Paydate
+--CONVERT(VARCHAR,PayDate,101) +' '+CONVERT(VARCHAR,PayDate,108) as PayDate
+,concat(LEFT(CAST((xpath('/r/trm_prv_id/text()',p.ExtraParams ::xml))[1]::TEXT  as varchar),10),RIGHT(concat('0000000000',cast(AgentTerminalID as varchar(10))),10))  as TransactionID
+      ,s.ServiceName
+      ,"Number",
+      providersum 
+,CAST((xpath('/r/customername/text()',p.PaymentInfo ::xml))[1]::TEXT  as varchar)  CustomerName
+from gate.payment p join gate.service s on p.serviceid =s.serviceid where p.ServiceID = 294 and  (PayDate BETWEEN '2022-05-10' and '2022-07-07')
+and CAST((xpath('/r/agt_id/text()',p.ExtraParams ::xml))[1]::TEXT  as varchar) <> '3'  and Status=2
