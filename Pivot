@@ -1,0 +1,30 @@
+
+---prod
+select * from
+(
+select osmpproviderid,s.servicename,format(paydate,'MMM','en-US') as tarix,paysum from 
+payment p with (nolock) join service s with (nolock)  on p.serviceid =s.serviceid where 
+agentterminalid not in (4244,4245,4702) and paydate between '2022-01-01' and '2022-07-01' and status=2 
+and CAST([ExtraParams].query('data(r/agt_id)') as nvarchar(max)) <>'3'
+) t 
+pivot 
+(sum(paysum) for tarix in ("Jan","Feb","Mar","Apr","May","Jun")) as p_table
+
+
+--postgre dwh
+
+
+
+select osmpproviderid,s.servicename,
+  sum(paysum) filter (where extract (month from paydate) ='1' ) as "Yanvar",
+  sum(paysum) filter (where extract (month from paydate) ='2' ) as "Fevral",
+  sum(paysum) filter (where extract (month from paydate) ='3' ) as "Mart",
+  sum(paysum) filter (where extract (month from paydate) ='4' ) as "Aprel",
+  sum(paysum) filter (where extract (month from paydate) ='5' ) as "May",
+  sum(paysum) filter (where extract (month from paydate) ='6' ) as "Iyun"
+from 
+gate.payment p 
+join gate.service s  on p.serviceid =s.serviceid where 
+agentterminalid not in (4244,4245,4702) and paydate between '2022-01-01' and '2022-07-01' 
+and CAST((xpath('/r/agt_id/text()',p.ExtraParams ::xml))[1]::TEXT  as varchar) <>'3'
+group by osmpproviderid,s.servicename
