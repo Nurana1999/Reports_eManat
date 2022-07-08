@@ -1,0 +1,6 @@
+select m.id_operation ,id_point,m.account,m.account2,state,substate,time_server,cast(sum_income as numeric)/100,
+cast(sum_outcome as numeric)/100 , cast(p.value as varchar) ,s.service_name from reckon.work_master m left join 
+(select id_operation,value from reckon.work_operation_attributes op where op.name ='operation-id') p
+on m.id_operation =p.id_operation 
+join reckon.work_services s on m.id_service =s.id_service 
+where   m.id_service in (1014,1015,1016)   and time_server between '2022-06-01' and '2022-07-01' and state=60 and substate=0
