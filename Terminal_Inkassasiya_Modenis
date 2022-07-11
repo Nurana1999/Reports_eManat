@@ -1,5 +1,9 @@
+--inkassasiya tarixleri -terminalcashout
+--inkassasiyadan sonra terminaldaki unit ve sum --terminalsum
+--terminalerrorlari--terminal
+
+
 USE [Main]
-Select * from (
 SELECT  t.[PointID]
  ,p.PointName
 	  ,[LastPayDateTime]  as 'Son ödəniş Tarixi',
@@ -24,7 +28,7 @@ SELECT  t.[PointID]
   where 
   ([NoteErrorID]=1 
   --OR [CashUnitsSum] > 3000 
-  OR [CashUnitsCount]>500)
+  and [CashUnitsCount]>500)
   and p.DealerID=5 
   and t.PointType=1
-  /*order by 7 desc*/) t where status = N'Pulqabi Dolub' and [Əskinaz sayı]>500  order by  7 desc
+  order by 7 desc)
