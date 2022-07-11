@@ -1,4 +1,7 @@
-select * from (
+--terminallarin son inkassasiya vaxti -- cash_boxes (id_cash_box)
+--terminallarda neqeder eskinas sayi var --cash_boxes_count (id_cash_box,id_money_unit)
+--terminallarda ne qeder mebleg var -- moneyunit-le cash_boxes_count-u id_money_unite gore join edib cixaririq
+
 select   EqSt.id_point as id_point , P.name as point_name, EqSt.last_payment as last_payment,
 CONCAT((case 
 when  cast((extract(day from now()) - extract (day from EqSt.last_payment)) as varchar) = '0' then '' 
@@ -40,4 +43,4 @@ left join ( select CashBox.id_point, CashBox.last_collection,
 where P.point_type=0 /*для точек типа Терминал*/ and CashUnits.last_collection is not null 
 and CashUnits.last_collection between date_trunc('day', CURRENT_DATE -1) and date_trunc('day', CURRENT_DATE)
 AND EqSt.validator_state=1 
-  OR CashUnits.units_count>500) t where validator_state ='Pulqabi Dolub' and units_count>500
+  and CashUnits.units_count>500
