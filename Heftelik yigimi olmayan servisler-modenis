@@ -1,0 +1,86 @@
+select x.Categories,x.OsmpProviderID,x.ProviderName,x.ServiceName,x."Sum",x."Count",y.lastpaydate from 
+(select b.Categories,a.OsmpProviderID,a.ProviderName,a.ServiceName,a."Sum",a."Count" from  (
+Select OsmpProviderID,pr.ProviderName,p.serviceid ,s.ServiceName,case when sum(PaySum) is null then 0 else sum(PaySum)
+end as "Sum" ,
+case when count(AgentPaymentID) is null then 0 else count(AgentPaymentID)
+end as "Count" from (
+(Select Osmp_ServiceID,ServiceID as ossid,OsmpProviderID,OsmpServiceID from gate.osmp_service
+/*where OsmpProviderID in
+(17820,18281,17821,17849,17841,17848,17847,17843,17710,17728,18806,18809,18807,18805,17924,18057,18052,15365,17736,18079,17514,10707,10705,18852,17815,17482,10709,17484,17749,17746,17753,13727,18197,14258,17861,17151,17777,17666,17445,17502,18820,
+14261,14259,17392,18148,17328,18849,18785,18784,17657,14756,18076,17501,18835,18831,18834,18814,18812,18360,18359,17757,18315,17760,17945,15804,17442,18278,17650,18328,18329,18330,18371,18340,
+18342,18870,18868,17190,18237,18287,18288,18184,14111,13728,17437,18034,17483,18097,18129,17726,17914,18077,18152,18151,18822,17191,17857,13729,17743,17150,17751,17882,
+18341,17750,18870,17365,17462,18338,18795,18063,17731,18325,18810,13751,18131,18066,17850,17503,18797,18781,
+15198)*/)os
+left join 
+(Select ServiceID as ssid,ServiceName ,ProviderID as spid from  gate.service) s on os.ossid=s.ssid
+left join 
+(Select ProviderID as pid,ProviderName from gate.provider) pr on s.spid=pr.pid
+left join 
+(Select AgentPaymentID,ServiceID,PayDate,PaySum,agentterminalid from gate.payment
+ where agentterminalid  not in (4244,4245,4702)
+and PayDate between (CURRENT_DATE - INTERVAL '1 week') and CURRENT_DATE )p on s.ssid=p.ServiceID)
+group by OsmpProviderID,pr.ProviderName,s.ServiceName,p.serviceid 
+) a left join 
+(Select 
+y."Kateqoriya" as Categories,y."Alt kategoriya",y.ServiceID,y.osmpproviderid ,ServiceName
+ from (
+Select case when a.Kateqoriya is null then a."Name"
+else a.Kateqoriya end as "Kateqoriya",
+case when s.ServiceID in (1009,1097,1035,1,2,1102,1103,1057,1186,1921,2037,2038,1074,2279,2280,1110,2669)
+then 'Qaz'
+when s.ServiceID in (1303,1304,1081,1082,3,4,1104,1059,1060,1061,1062,1064,1065,1066,1067,1923,1020,1021,1275,1092,1093)
+then 'SU'
+when s.ServiceID in (1026,1994,1995,1996,2012,1025,2277,2278,2285,2286,2708,1922,1109,2684)--(azerisiq_hop,azerisiq,azerenerji(komtec),naxelektrik)
+then 'Elektrik'
+when s.ServiceID in (1116,1118,2600)
+then N'Istilik'
+when s.ServiceID in ('1377','1325','1045','1046','1341','1376','2344','2345','2346','2347','2351','2354','2355','2342','2343',
+'2372','2373','2348','2349','2350','2368','2369','2370','2371','2374','2375','2376','2377','2378','2379','2380','2381','2382','2383','1044','2384',
+'2655','2300','2154'
+)
+then N'ölkəxarici pul kisələrinə vəsait qoyuluşu'
+when s.ServiceID in ('2111','2112','2136','2137','2138','2140','2129','2130','2131','2132','2088','2089','2090','2091','2099',
+'2100','2101','2102','2103','2104','2105','2106','2107','2108','2109','2110','2113','2114','2115','2116','2117','2133','2135',
+'2141','2189','2188','2190','2247','2248','1565','1566','2246','2098','2294','2295','2296','2353','2292','2293','2127','2128','2174',
+'2395','2681','2556','2536','2386','2389','2394','2396','2306','2558','2561')
+then N'ölkədaxili pul kisələrinə vəsait qoyuluşu'
+end as "Alt kategoriya",s.osmpproviderid,s.ServiceID as ServiceID,s."Name" as ServiceName,s.ServiceGroupID from (
+Select  sg."Name" as Kateqoriya, sg1."Name",/*sg.ServiceGroupID,*/sg1.ServiceGroupID from (
+Select * from ServiceGroup /*where [ParentServiceGroupID] is null*/) sg
+right join 
+(
+Select ServiceGroupID,case when ParentServiceGroupID in (1044,1060,1061,1062,1063,1064,1065)
+then 2  
+when ParentServiceGroupID in (1069,1038,1074,1028,1033,1027,1086,1089,1111,1074,1137,1151,1031)
+then 1007
+when ParentServiceGroupID in (1099,1011,1023,1095)
+then  1016
+when ParentServiceGroupID in (1015,1025)
+then 1006
+when ParentServiceGroupID in (1026)
+then 1019
+when ParentServiceGroupID in (1043)
+then 1005
+else ParentServiceGroupID
+end as "ParentServiceGroupID",
+ "Name","Comment"
+from ServiceGroup ) sg1  on sg.ServiceGroupID=sg1."ParentServiceGroupID"
+/*where sg.Name is not null*/ ) a right join Service s on a.ServiceGroupID=s.ServiceGroupID) y) b
+on a.osmpproviderid =b.osmpproviderid ) x
+join
+(select os.OsmpProviderID,max(PayDate) as lastpaydate from (
+(Select Osmp_ServiceID,ServiceID as ossid,OsmpProviderID,OsmpServiceID from gate.osmp_service
+/*where OsmpProviderID in
+(17820,18281,17821,17849,17841,17848,17847,17843,17710,17728,18806,18809,18807,18805,17924,18057,18052,15365,17736,18079,17514,10707,10705,18852,17815,17482,10709,17484,17749,17746,17753,13727,18197,14258,17861,17151,17777,17666,17445,17502,18820,
+14261,14259,17392,18148,17328,18849,18785,18784,17657,14756,18076,17501,18835,18831,18834,18814,18812,18360,18359,17757,18315,17760,17945,15804,17442,18278,17650,18328,18329,18330,18371,18340,
+18342,18870,18868,17190,18237,18287,18288,18184,14111,13728,17437,18034,17483,18097,18129,17726,17914,18077,18152,18151,18822,17191,17857,13729,17743,17150,17751,17882,
+18341,17750,18870,17365,17462,18338,18795,18063,17731,18325,18810,13751,18131,18066,17850,17503,18797,18781,
+15198)*/)os
+left join 
+(Select ServiceID as ssid,ServiceName ,ProviderID as spid from  gate.service) s on os.ossid=s.ssid
+left join 
+(Select ProviderID as pid,ProviderName from gate.provider) pr on s.spid=pr.pid
+left join 
+(Select AgentPaymentID,ServiceID,PayDate,PaySum,agentterminalid from gate.payment
+ where agentterminalid  not in (4244,4245,4702))p on s.ssid=p.ServiceID)
+group by os.OsmpProviderID) y on x.OsmpProviderID=y.OsmpProviderID where y.lastpaydate is not null
