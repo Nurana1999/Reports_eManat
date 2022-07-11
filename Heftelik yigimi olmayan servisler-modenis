@@ -1,16 +1,12 @@
+----Modenis
+
 select x.Categories,x.OsmpProviderID,x.ProviderName,x.ServiceName,x."Sum",x."Count",y.lastpaydate from 
 (select b.Categories,a.OsmpProviderID,a.ProviderName,a.ServiceName,a."Sum",a."Count" from  (
 Select OsmpProviderID,pr.ProviderName,p.serviceid ,s.ServiceName,case when sum(PaySum) is null then 0 else sum(PaySum)
 end as "Sum" ,
 case when count(AgentPaymentID) is null then 0 else count(AgentPaymentID)
 end as "Count" from (
-(Select Osmp_ServiceID,ServiceID as ossid,OsmpProviderID,OsmpServiceID from gate.osmp_service
-/*where OsmpProviderID in
-(17820,18281,17821,17849,17841,17848,17847,17843,17710,17728,18806,18809,18807,18805,17924,18057,18052,15365,17736,18079,17514,10707,10705,18852,17815,17482,10709,17484,17749,17746,17753,13727,18197,14258,17861,17151,17777,17666,17445,17502,18820,
-14261,14259,17392,18148,17328,18849,18785,18784,17657,14756,18076,17501,18835,18831,18834,18814,18812,18360,18359,17757,18315,17760,17945,15804,17442,18278,17650,18328,18329,18330,18371,18340,
-18342,18870,18868,17190,18237,18287,18288,18184,14111,13728,17437,18034,17483,18097,18129,17726,17914,18077,18152,18151,18822,17191,17857,13729,17743,17150,17751,17882,
-18341,17750,18870,17365,17462,18338,18795,18063,17731,18325,18810,13751,18131,18066,17850,17503,18797,18781,
-15198)*/)os
+(Select Osmp_ServiceID,ServiceID as ossid,OsmpProviderID,OsmpServiceID from gate.osmp_service)os
 left join 
 (Select ServiceID as ssid,ServiceName ,ProviderID as spid from  gate.service) s on os.ossid=s.ssid
 left join 
@@ -69,13 +65,7 @@ from ServiceGroup ) sg1  on sg.ServiceGroupID=sg1."ParentServiceGroupID"
 on a.osmpproviderid =b.osmpproviderid ) x
 join
 (select os.OsmpProviderID,max(PayDate) as lastpaydate from (
-(Select Osmp_ServiceID,ServiceID as ossid,OsmpProviderID,OsmpServiceID from gate.osmp_service
-/*where OsmpProviderID in
-(17820,18281,17821,17849,17841,17848,17847,17843,17710,17728,18806,18809,18807,18805,17924,18057,18052,15365,17736,18079,17514,10707,10705,18852,17815,17482,10709,17484,17749,17746,17753,13727,18197,14258,17861,17151,17777,17666,17445,17502,18820,
-14261,14259,17392,18148,17328,18849,18785,18784,17657,14756,18076,17501,18835,18831,18834,18814,18812,18360,18359,17757,18315,17760,17945,15804,17442,18278,17650,18328,18329,18330,18371,18340,
-18342,18870,18868,17190,18237,18287,18288,18184,14111,13728,17437,18034,17483,18097,18129,17726,17914,18077,18152,18151,18822,17191,17857,13729,17743,17150,17751,17882,
-18341,17750,18870,17365,17462,18338,18795,18063,17731,18325,18810,13751,18131,18066,17850,17503,18797,18781,
-15198)*/)os
+(Select Osmp_ServiceID,ServiceID as ossid,OsmpProviderID,OsmpServiceID from gate.osmp_service)os
 left join 
 (Select ServiceID as ssid,ServiceName ,ProviderID as spid from  gate.service) s on os.ossid=s.ssid
 left join 
@@ -84,3 +74,26 @@ left join
 (Select AgentPaymentID,ServiceID,PayDate,PaySum,agentterminalid from gate.payment
  where agentterminalid  not in (4244,4245,4702))p on s.ssid=p.ServiceID)
 group by os.OsmpProviderID) y on x.OsmpProviderID=y.OsmpProviderID where y.lastpaydate is not null
+
+--MPay
+
+
+select st.name categories,a.id_service, case when l."name" is null then '' else l."name"  end as "providername" ,a.name servicename,
+case when a.sum_income is null 
+then 0 else a.sum_income 
+end as "sum_income" ,
+a.say Count, case when  cast(a.lastdate as varchar) is null 
+then '-' else cast(a.lastdate as varchar)
+end as   "lastpaydate" from 
+(select s.name,m.id_provider,s.id_service,s.id_service_type,sum(sumincome) sum_income,count(id_operation) say,max(time_server) lastdate from(
+(select * from public.services ) s left join 
+(select id_operation,id_legal,id_provider , id_service,cast(sum_income as numeric)/100 as sumincome,time_server from operations.master
+where time_server (CURRENT_DATE - INTERVAL '1 week') and CURRENT_DATE and id_point<>8) m 
+on s.id_service =m.id_service 
+) group by s.name,s.id_service,m.id_provider,s.id_service_type) a left join
+(select * from public.legals) l on a.id_provider =l.id_legal
+join 
+(select * from public.service_types) st on a.id_service_type=st.id_service_type
+
+
+
