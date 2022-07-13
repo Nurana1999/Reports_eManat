@@ -1,0 +1,7 @@
+select  qrup."GROUP_NAME", cat."NAME" CategoryName from 
+(SELECT "DELETED_TIME", "GROUP_NAME", "ID", "ORDER", "VIEWPORT_ID"
+FROM public."AO_54307E_GROUP"  where "ID" in (1,26,60) )qrup join 
+(SELECT "GROUP_ID", "ID", "ORDER", "REQUEST_TYPE_ID"
+FROM public."AO_54307E_GROUPTOREQUESTTYPE") req  on qrup."ID" =req."GROUP_ID" 
+join 
+(select * from public."AO_54307E_VIEWPORTFORM") cat on req."REQUEST_TYPE_ID" =cat."ID" order by  qrup."GROUP_NAME"
