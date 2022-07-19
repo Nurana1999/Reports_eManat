@@ -88,7 +88,7 @@ end as   "lastpaydate" from
 (select s.name,m.id_provider,s.id_service,s.id_service_type,sum(sumincome) sum_income,count(id_operation) say,max(time_server) lastdate from(
 (select * from public.services ) s left join 
 (select id_operation,id_legal,id_provider , id_service,cast(sum_income as numeric)/100 as sumincome,time_server from operations.master
-where time_server (CURRENT_DATE - INTERVAL '1 week') and CURRENT_DATE and id_point<>8) m 
+where time_server between (CURRENT_DATE - INTERVAL '1 week') and CURRENT_DATE and id_point<>8) m 
 on s.id_service =m.id_service 
 ) group by s.name,s.id_service,m.id_provider,s.id_service_type) a left join
 (select * from public.legals) l on a.id_provider =l.id_legal
