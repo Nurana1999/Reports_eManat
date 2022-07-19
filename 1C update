@@ -1,0 +1,46 @@
+select  
+concat(cast(id_service as varchar),cast("ID" as varchar)) as id_service,case when "service" is null
+then name else "service" end as "servicename" , sum_in,sum_out,sum_com,"Count",legal,
+case when concat(cast(id_service as varchar),cast("ID" as varchar)) in ('80306','146106','146206','146306') 
+then 'Birləşmiş sukanal MMC (Azərsu)' else provider end as provider from 
+  (select   q.id_service,   
+case when q.id_service  in (797,798,1460,803,1461,1462,1463)
+then  CASE
+     WHEN LEFT(q.account, 2) in ('01','02','03','04','05','06','07','08','09','10','11','13','15','18','22','31','32','33','34','35','36','37','38','39','40',
+    '41','42','43','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','65','66','67','68','69','70','71','72',
+    '73','74','75','76','77','78','79','81','82','83','84','85','86') THEN N'01'
+     WHEN LEFT(q.account, 2) = '27' THEN N'02'
+     WHEN LEFT(q.account, 2) = '80' THEN N'05'
+     WHEN LEFT(q.account, 2) in ('28','29','44','64') THEN N'06'
+     ELSE ' 00'  end  end "ID",
+  case when q.id_service  in (797,798,1460,803,1461,1462,1463)
+   then CASE 
+    WHEN LEFT(q.account, 2) in ('01','02','03','04','05','06','07','08','09','10','11','13','15','18','22','31','32','33','34','35','36','37','38','39','40',
+    '41','42','43','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','65','66','67','68','69','70','71','72',
+    '73','74','75','76','77','78','79','81','82','83','84','85','86') THEN N' Azersu ASC'
+    WHEN LEFT(q.account, 2) = '27' THEN N' Seki TSC'
+    WHEN LEFT(q.account, 2) = '80' THEN N' Gence TSC'
+    WHEN LEFT(q.account, 2) in ('28','29','44','64') THEN N' Birlesmis sukanal MMC'
+ELSE
+ s.name
+END 
+  end as  "service",
+  s."name" ,
+sum(cast(q.sum_income as numeric))/100 as sum_in,
+sum(cast(q.sum_outcome as numeric))/100 as sum_out,
+sum(cast(sum_comm as numeric))/100 as sum_com,
+count(*) as "Count",
+l.id_legal as legal,
+p.name as provider
+from operations.master q
+left join services s on (q.id_service=s.id_service)
+left join legals l on (q.id_legal=l.id_legal)
+left join legals p on (q.id_provider=p.id_legal)
+where q.state = 60    
+       and p.id_legal not in (16,17,20)   
+       and q.substate = 0
+        and q.time_process >= '2022-05-01' 
+       and q.time_process < '2022-06-01' 
+       and q.time_server >= date '2022-05-01' - interval '7day'
+       and q.time_server < date '2022-06-01' + interval '7day'
+     group by q.id_service,"service",l.id_legal ,p.name , s."name" ,"ID") t    
