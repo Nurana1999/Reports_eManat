@@ -1,0 +1,19 @@
+---Modenis
+
+Select extract(month from paydate),ProviderName,s.ServiceName,
+count(*) Say from gate.payment p 
+join gate.service  s   on p.ServiceID=s.ServiceID
+join gate.provider pp  on s.ProviderID=pp.ProviderID
+where paydate between '2022-05-01' and '2022-07-21'
+group by extract(month from paydate),ProviderName,s.ServiceName order by extract(month from paydate)
+
+--Mpay
+
+SELECT extract( month from OM.time_server) as date,l."name" ,s.name as serviceName, count(OM.id_operation) as trnCount
+FROM operations.master OM
+join public.services s on OM.id_service = s.id_service
+join public.provider_services ps on ps.id_service =s.id_service 
+join public.legals l on l.id_legal =ps.id_legal 
+WHERE OM.time_server  between '2022-05-01' and '2022-07-21'
+group by 1,2,3
+ORDER BY 1
