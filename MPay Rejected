@@ -1,0 +1,31 @@
+---rejected
+
+select m.id_service,m.id_operation,id_point,s."name", account, 
+cast(sum_income as numeric)/100 sum_income,cast(sum_outcome as numeric)/100 sum_outcome
+,cast(sum_comm as numeric)/100 sum_comm,
+time_server,state,substate,string_agg(op."comment",',')comm1 ,string_agg(opp."comment",',' ) comm2
+from operations.master m join public.services s on m.id_service =s.id_service 
+left join public.operation_comments op on m.id_operation =op.id_operation 
+left join 
+(select id_operation,value "comment"  from public.operation_attributes opp
+where opp."name"='comment') opp 
+on m.id_operation =opp.id_operation 
+where state=80 and substate<>6 and  sum_income<>0 and 
+ time_process >= '2022-06-01' 
+       and time_process < '2022-07-01' 
+       and time_server >= date '2022-06-01' - interval '7day'
+       and time_server < date '2022-07-01' + interval '7day'
+group by m.id_service,m.id_operation,id_point,s."name", account, 
+cast(sum_income as numeric)/100,cast(sum_outcome as numeric)/100 
+,cast(sum_comm as numeric)/100 ,time_server,state,substate2
+
+
+--revoked
+
+select m.id_service,m.id_operation,id_point,s."name", account, cast(sum_income as numeric)/100 sum_income,cast(sum_outcome as numeric)/100 sum_outcome
+,cast(sum_comm as numeric)/100 sum_comm ,time_server,state,substate,concat(op."comment",'.') from operations.master m join public.services s on m.id_service =s.id_service 
+left join public.operation_comments op on m.id_operation =op.id_operation 
+where state=60 and substate in (1,2) and  time_process >= '2022-06-01' 
+       and time_process < '2022-07-01' 
+       and time_server >= date '2022-06-01' - interval '7day'
+       and time_server < date '2022-07-01' + interval '7day'    
